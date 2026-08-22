@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from schemas import PostCreate, PostResponse
+
 # Create FastAPI application instance
 app = FastAPI()
 # Mount static files directory
@@ -53,18 +55,32 @@ def post_page(request: Request, post_id: int):
             )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
 
-# API endpoint to get all posts
-@app.get("/api/posts")
+# API endpoint to get all posts, validated using PostResponse Schema
+@app.get("/api/posts", response_model=list[PostResponse])
 def get_posts():
     return posts
 
-# API endpoint to get a specific post by ID
-@app.get("/api/posts/{post_id}")
+# API endpoint to get a specific post by ID, validated using PostResponse Schema
+@app.get("/api/posts/{post_id}", response_model=PostResponse)
 def get_post(post_id: int):
     for post in posts:
         if post["id"] == post_id:
             return post
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+
+# API endpoint to create a post, validated using PostCreate Schema
+@app.post("/api/posts", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
+def create_post(post: PostCreate):
+    new_id = max(p["id"] for p in posts) + 1 if posts else 1
+    new_post = {
+        "id": new_id,
+        "author": post.author,
+        "title": post.title,
+        "content": post.content,
+        "date_posted": "August 21, 2026",
+    }
+    posts.append(new_post)
+    return new_post
 
 # Custom exception handler for validation errors
 @app.exception_handler(StarletteHTTPException)
