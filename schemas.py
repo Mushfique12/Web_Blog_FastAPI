@@ -23,6 +23,13 @@ class UserResponse(UserBase):
     image_path: str
 
 
+# Schema for updating an User
+class UserUpdate(BaseModel):
+    username: str | None = Field(default=None, min_length=1, max_length=50)
+    email: EmailStr | None = Field(default=None, max_length=120)
+    image_file: str | None = Field(default=None, min_length=1, max_length=200)
+
+
 # Base Schema used for creating and returning a Post
 class PostBase(BaseModel):
     # Specifying type, and constraints
@@ -34,6 +41,13 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     # Temporary
     user_id: int
+
+
+# Schema for updating a Post
+class PostUpdate(BaseModel):
+    # Specifying type, and constraints
+    title: str | None = Field(default=None, min_length=1, max_length=100)
+    content: str | None = Field(default=None, min_length=1)
 
 
 # Schema for returning a Post

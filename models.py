@@ -22,7 +22,9 @@ class User(Base):
 
     # One-to-Many relationship - One user can have multiple posts
     # Python 3.14+ allows forward reference (ref sth before its actually defined)
-    posts: Mapped[list[Post]] = relationship(back_populates="author")
+    # Cascade - Deletes posts if the user is deleted
+    posts: Mapped[list[Post]] = relationship(back_populates="author",
+                                cascade="all, delete-orphan")
 
     @property
     def image_path(self) -> str:
