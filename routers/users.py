@@ -96,7 +96,10 @@ async def get_user(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
 )
 async def get_user_posts(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
     # Finds a matching user ID in the DB (Query)
-    result = await db.execute(select(models.User).where(models.User.id == user_id))
+    result = await db.execute(
+        select(models.User)
+        .where(models.User.id == user_id)
+    )
 
     # Gets the first user object or None
     user = result.scalars().first()
