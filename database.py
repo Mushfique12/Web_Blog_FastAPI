@@ -1,18 +1,22 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 # Setting up the Path for the Database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./blog.db"
+SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./blog.db"
 
 # Connection to the Database
 # SQLite only allows single thread (hence False)
-engine = create_engine(
+engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
 )
 
 # Factory that creates Database Sessions (Session - transaction with the DB, each Request gets its own Session)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 
 class Base(DeclarativeBase):
@@ -20,6 +24,6 @@ class Base(DeclarativeBase):
 
 
 # Dependency Fn that provides sessions to routes
-def get_db():
-    with SessionLocal() as db:
-        yield db
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
