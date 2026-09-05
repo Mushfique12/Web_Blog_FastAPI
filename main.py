@@ -1,22 +1,19 @@
-from typing import Annotated
 from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI, HTTPException, Request, status
-from fastapi.exception_handlers import (
-    http_exception_handler,
-    request_validation_exception_handler,
-)
-from fastapi import FastAPI, Request, HTTPException, status, Depends
-from fastapi.exceptions import RequestValidationError
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from typing import Annotated
 
 import models
 from database import Base, engine, get_db
+from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.exception_handlers import (http_exception_handler,
+                                        request_validation_exception_handler)
+from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from routers import posts, users
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 # Creates the Database tables
@@ -122,6 +119,26 @@ async def user_posts_page(
         request,
         "user_posts.html",
         {"posts": posts, "user": user, "title": f"{user.username}'s Posts"},
+    )
+
+
+# Define route to get the login page
+@app.get("/login", include_in_schema=False)
+async def login_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "login.html",
+        {"title": "Login"},
+    )
+
+
+# Define route to get the register page
+@app.get("/register", include_in_schema=False)
+async def register_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "register.html",
+        {"title": "Register"},
     )
 
 

@@ -1,13 +1,12 @@
 from typing import Annotated
 
+import models
+from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
+from schemas import PostCreate, PostResponse, PostUpdate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-
-import models
-from database import get_db
-from schemas import PostCreate, PostResponse, PostUpdate
 
 # Creates a router for the post endpoints
 router = APIRouter()

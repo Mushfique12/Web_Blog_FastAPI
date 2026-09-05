@@ -1,8 +1,9 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, EmailStr
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
-# Base Schema used for creating and returning an User
+# Base Schema used for creating an User
 class UserBase(BaseModel):
     username: str = Field(min_length=1, max_length=50)
     email: EmailStr = Field(max_length=120)
@@ -10,17 +11,23 @@ class UserBase(BaseModel):
 
 # Schema for creating an User
 class UserCreate(UserBase):
-    pass
+    password: str = Field(min_length=8)
 
 
-# Schema for returning an User
-class UserResponse(UserBase):
+# Schema for returning an User Public info
+class UserPublic(BaseModel):
     # Allows pydantic to read data from attributes, not just dictionanries
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    username: str
     image_file: str | None
     image_path: str
+
+
+# Schema for returning an User Private info
+class UserPrivate(UserPublic):
+    email: EmailStr
 
 
 # Schema for updating an User
@@ -28,6 +35,12 @@ class UserUpdate(BaseModel):
     username: str | None = Field(default=None, min_length=1, max_length=50)
     email: EmailStr | None = Field(default=None, max_length=120)
     image_file: str | None = Field(default=None, min_length=1, max_length=200)
+
+
+# Schema for returning an access token
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 # Base Schema used for creating and returning a Post
@@ -59,4 +72,4 @@ class PostResponse(PostBase):
     id: int
     user_id: int
     date_posted: datetime
-    author: UserResponse
+    author: UserPublic
