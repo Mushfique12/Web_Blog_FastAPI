@@ -52,8 +52,7 @@ class PostBase(BaseModel):
 
 # Schema for creating a Post
 class PostCreate(PostBase):
-    # Temporary
-    user_id: int
+    pass
 
 
 # Schema for updating a Post

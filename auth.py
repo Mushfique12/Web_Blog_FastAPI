@@ -1,13 +1,22 @@
 from datetime import UTC, datetime, timedelta
+from typing import Annotated
 
 import jwt
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+import models
 from config import settings
+from database import get_db
 
+# Creates a Password Hasher using Argon2 recommended settings
 password_hash = PasswordHash.recommended()
 
+# Extracts the token from the Authorization header
+# Enables the Authorize button in the Docs
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/users/token")
 
 
@@ -54,3 +63,45 @@ def verify_access_token(token: str) -> str | None:
         return None
     else:
         return payload.get("sub")
+
+
+# Retrieves the current user from the database based on the JWT access token
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> models.User:
+
+    # Verify the access token and extract the user id
+    user_id = verify_access_token(token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Convert the user id to an integer and retrieve the user from the database
+    try:
+        user_id_int = int(user_id)
+    except (TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Query the database for the user with the given id
+    result = await db.execute(
+        select(models.User).where(models.User.id == user_id_int),
+    )
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+# Defines a type alias for the current user, which can be used in route dependencies
+CurrentUser = Annotated[models.User, Depends(get_current_user)]
