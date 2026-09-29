@@ -40,7 +40,7 @@ async def create_post(
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
-    # Creates the post with the authenticated user ID
+    # Creates the post with the authenticated user ID using DB models
     new_post = models.Post(
         title=post.title,
         content=post.content,
@@ -50,6 +50,7 @@ async def create_post(
     # Add it to the DB
     db.add(new_post)
     await db.commit()
+    # Refresh the post to get the author relationship loaded
     await db.refresh(new_post, attribute_names=["author"])
     return new_post
 
@@ -61,7 +62,11 @@ async def create_post(
 )
 async def get_post(post_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
     # Finds a matching post ID in the DB (Query)
-    result = await db.execute(select(models.Post).where(models.Post.id == post_id))
+    result = await db.execute(
+        select(models.Post)
+        .options(selectinload(models.Post.author))
+        .where(models.Post.id == post_id)
+    )
     post = result.scalars().first()
 
     if post:
@@ -102,10 +107,10 @@ async def update_post_full(
     # Updates the info for the post
     post.title = post_data.title
     post.content = post_data.content
-    post.user_id = current_user.id
 
     # Commiting to the DB
     await db.commit()
+    # Refresh the post to get the author relationship loaded
     await db.refresh(post, attribute_names=["author"])
     return post
 
@@ -145,6 +150,7 @@ async def update_post_partial(
 
     # Commiting to the DB
     await db.commit()
+    # Refresh the post to get the author relationship loaded
     await db.refresh(post, attribute_names=["author"])
     return post
 

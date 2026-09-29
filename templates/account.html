@@ -146,6 +146,7 @@
         updateForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
+            // Check if the user is logged in by verifying the presence of a token
             const token = getToken();
             if (!token) {
                 window.location.href = '/login';
@@ -165,11 +166,11 @@
                     body: JSON.stringify(userData),
                 });
 
+                // Handle 401 Unauthorized and 403 Forbidden responses
                 if (response.status === 401) {
                     window.location.href = '/login';
                     return;
                 }
-
                 if (response.status === 403) {
                     document.getElementById('errorMessage').textContent =
                     'You are not authorized to update this profile.';
@@ -177,6 +178,7 @@
                     return;
                 }
 
+                // Handle success and error responses
                 if (response.ok) {
                     const data = await response.json();
 
@@ -207,6 +209,7 @@
 
         // Delete Account Handler
         document.getElementById('confirmDeleteAccount').addEventListener('click', async () => {
+            // Check if the user is logged in by verifying the presence of a token
             const token = getToken();
             if (!token) {
                 window.location.href = '/login';
@@ -221,11 +224,11 @@
                     },
                 });
 
+                // Handle 401 Unauthorized and 403 Forbidden responses
                 if (response.status === 401) {
                     window.location.href = '/login';
                     return;
                 }
-
                 if (response.status === 403) {
                     document.getElementById('errorMessage').textContent =
                     'You are not authorized to delete this account.';
@@ -234,6 +237,7 @@
                     return;
                 }
 
+                // Handle success and error responses
                 if (response.status === 204) {
                     // Account deleted successfully
                     localStorage.removeItem('access_token');

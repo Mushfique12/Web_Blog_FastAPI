@@ -1,19 +1,20 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-import models
-from database import Base, engine, get_db
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.exception_handlers import (http_exception_handler,
                                         request_validation_exception_handler)
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from routers import posts, users
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+import models
+from database import Base, engine, get_db
+from routers import posts, users
 
 
 # Creates the Database tables
@@ -35,7 +36,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Mount media directory for user uploaded content
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
-# Set up Jinja2 templates
+# Set up Jinja2 templates with the directory
 templates = Jinja2Templates(directory="templates")
 
 # Include routers for posts and users with appropriate prefixes and tags
@@ -156,7 +157,7 @@ async def account_page(request: Request):
 async def general_http_exception_handler(
     request: Request, exception: StarletteHTTPException
 ):
-    # Return JSON response for API requests, otherwise render error template
+    # If the request path starts with "/api", it is considered an API request, and the default HTTP exception handler is used to return a JSON response.
     if request.url.path.startswith("/api"):
         return await http_exception_handler(request, exception)
 
@@ -181,7 +182,7 @@ async def general_http_exception_handler(
 # Custom exception handler for request validation errors
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exception: RequestValidationError):
-    # Return JSON response for API requests, otherwise render error template
+    # If the request path starts with "/api", it is considered an API request, and the default request validation exception handler is used to return a JSON response.
     if request.url.path.startswith("/api"):
         return await request_validation_exception_handler(request, exception)
 

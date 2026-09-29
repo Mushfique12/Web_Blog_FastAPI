@@ -3,9 +3,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from database import Base
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from database import Base
 
 
 # Creates a Table named - "users"
@@ -25,8 +26,10 @@ class User(Base):
     # One-to-Many relationship - One user can have multiple posts
     # Python 3.14+ allows forward reference (ref sth before its actually defined)
     # Cascade - Deletes posts if the user is deleted
-    posts: Mapped[list[Post]] = relationship(back_populates="author",
-                                cascade="all, delete-orphan")
+    posts: Mapped[list[Post]] = relationship(
+                                    back_populates="author",
+                                    cascade="all, delete-orphan"
+                                )
 
     @property
     def image_path(self) -> str:

@@ -285,6 +285,7 @@
         }
     }
 
+    // Update UI on page load
     updateAuthUI();
     </script>
     <!-- Create Post Form Handler -->
@@ -308,6 +309,7 @@
           window.location.href = '/login';
           return;
         }
+        
         // Gather form values into a plain object {title: "...", content: "..."}
         const formData = new FormData(createForm);
         const postData = Object.fromEntries(formData.entries());
@@ -329,6 +331,7 @@
             return;
           }
 
+          // Handles the response
           if (response.ok) {
             const data = await response.json();
             document.getElementById("successMessage").textContent =
@@ -340,7 +343,7 @@
             // Clear form
             createForm.reset();
 
-            // Reload page after modal is hidden to show new post
+            // Reload page after modal is hidden to show the new post (if the user is on the homepage)
             document
               .getElementById("successModal")
               .addEventListener(

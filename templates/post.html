@@ -104,9 +104,14 @@
   </div>
 {% endblock content %}
 {% block scripts %}
+  <!-- Edit & Delete Post Form Handler -->
   <script type="module">
+    import {
+      getErrorMessage,
+      hideModal,
+      showModal,
+    } from "/static/js/utils.js";
     import { getCurrentUser, getToken } from '/static/js/auth.js';
-    import { getErrorMessage, showModal, hideModal } from '/static/js/utils.js';
 
     // Get Post ID and User ID from Jinja2 template
     const postId = {{ post.id }};
@@ -155,6 +160,7 @@
         if (response.status === 403) {
             document.getElementById('errorMessage').textContent =
                 'You are not authorized to edit this post.';
+
             hideModal('editModal');
             showModal('errorModal');
             return;
@@ -164,9 +170,11 @@
         if (response.ok) {
           document.getElementById("successMessage").textContent =
             "Post updated successfully!";
+
           hideModal("editModal");
           showModal("successModal");
 
+          // Reload page after modal is hidden to show the updated post
           document.getElementById("successModal").addEventListener("hidden.bs.modal", () => {
               window.location.reload();
             }, { once: true },
@@ -174,12 +182,14 @@
         } else {
           const error = await response.json();
           document.getElementById("errorMessage").textContent = getErrorMessage(error);
+
           hideModal("editModal");
           showModal("errorModal");
         }
       } catch (error) {
         document.getElementById("errorMessage").textContent =
           "Network error. Please check your connection and try again.";
+
         showModal("errorModal");
       }
     });
@@ -187,6 +197,8 @@
     // Delete Post Handler - listen for click on delete button
     const deleteButton = document.getElementById("confirmDelete");
     deleteButton.addEventListener("click", async () => {
+
+      // Check if the user is logged in by verifying the presence of a token
       const token = getToken();
       if (!token) { window.location.href = '/login'; return; }
 
@@ -204,6 +216,7 @@
         if (response.status === 403) {
             document.getElementById('errorMessage').textContent =
                 'You are not authorized to delete this post.';
+
             hideModal('deleteModal');
             showModal('errorModal');
             return;
@@ -216,12 +229,14 @@
         } else {
           const error = await response.json();
           document.getElementById("errorMessage").textContent = getErrorMessage(error);
+
           hideModal("deleteModal");
           showModal("errorModal");
         }
       } catch (error) {
         document.getElementById("errorMessage").textContent =
           "Network error. Please check your connection and try again.";
+          
         showModal("errorModal");
       }
     });

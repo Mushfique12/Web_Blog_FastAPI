@@ -16,7 +16,7 @@ class UserCreate(UserBase):
 
 # Schema for returning an User Public info
 class UserPublic(BaseModel):
-    # Allows pydantic to read data from attributes, not just dictionanries
+    # Allows pydantic to read data from attributes, not just dictionaries
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -32,6 +32,7 @@ class UserPrivate(UserPublic):
 
 # Schema for updating an User
 class UserUpdate(BaseModel):
+    # Specifying type, and constraints. Allows fields to be optional (None)
     username: str | None = Field(default=None, min_length=1, max_length=50)
     email: EmailStr | None = Field(default=None, max_length=120)
     image_file: str | None = Field(default=None, min_length=1, max_length=200)
@@ -57,7 +58,7 @@ class PostCreate(PostBase):
 
 # Schema for updating a Post
 class PostUpdate(BaseModel):
-    # Specifying type, and constraints
+    # Specifying type, and constraints. Allows fields to be optional (None)
     title: str | None = Field(default=None, min_length=1, max_length=100)
     content: str | None = Field(default=None, min_length=1)
 

@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 
 import models
 from auth import (CurrentUser, create_access_token, hash_password,
-                  oauth2_scheme, verify_access_token, verify_password)
+                  verify_password)
 from config import settings
 from database import get_db
 from schemas import (PostResponse, Token, UserCreate, UserPrivate, UserPublic,
@@ -19,7 +19,7 @@ from schemas import (PostResponse, Token, UserCreate, UserPrivate, UserPublic,
 router = APIRouter()
 
 
-# API endpoint to create a post, validated using UserCreate Schema
+# API endpoint to create an User, validated using UserCreate Schema
 @router.post(
     "", 
     response_model=UserPrivate, 
@@ -163,7 +163,8 @@ async def get_user_posts(user_id: int, db: Annotated[AsyncSession, Depends(get_d
     result = await db.execute(
         select(models.Post)
         .options(selectinload(models.Post.author))
-        .where(models.Post.user_id == user_id),
+        .where(models.Post.user_id == user_id)
+        .order_by(models.Post.date_posted.desc()),
     )
     posts = result.scalars().all()
     return posts

@@ -1,10 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
 from sqlalchemy.orm import DeclarativeBase
 
 # Setting up the Path for the Database
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./blog.db"
 
-# Connection to the Database
+# Connection to the Database using Async Engine
 # SQLite only allows single thread (hence False)
 engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -19,6 +20,7 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
+# Base model for all the Tables in the DB
 class Base(DeclarativeBase):
     pass
 

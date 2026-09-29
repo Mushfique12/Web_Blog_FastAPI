@@ -2,16 +2,18 @@ from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+# Settings class for application configuration
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
     )
 
+    # Settings for JWT Authentication
     secret_key: SecretStr
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 
 
 # Loaded from .env file
-settings = Settings()   # type: ignore[call-arg] 
+settings = Settings()   # type: ignore[call-arg]
