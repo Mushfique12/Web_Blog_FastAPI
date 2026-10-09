@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # Settings for file uploads
     max_upload_size_bytes: int = 5 * 1024 * 1024  # 5 MB
 
+    # Default no. of pages to be displayed
+    posts_per_page: int = 5
+
 
 # Loaded from .env file
 settings = Settings()   # type: ignore[call-arg]
