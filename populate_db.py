@@ -14,8 +14,8 @@ POPULATE_IMAGES_DIR = Path("populate_images")
 
 USERS = [
     {
-        "username": "MohammadRahman",
-        "email": "MohammadRahman@gmail.com",
+        "username": "Mushfique",
+        "email": "mushfique@gmail.com",
         "password": "TestPassword1!",
         "image": "mush.jpg",
     },
@@ -243,6 +243,7 @@ async def clear_existing_data() -> None:
 
     # Clear database tables (order respects foreign keys)
     async with AsyncSessionLocal() as db:
+        await db.execute(delete(models.PasswordResetToken))
         await db.execute(delete(models.Post))
         await db.execute(delete(models.User))
         await db.commit()

@@ -81,3 +81,20 @@ class PaginatedPostsResponse(BaseModel):
     skip: int
     limit: int
     has_more: bool
+
+
+# Schemas for password reset functionality
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr = Field(max_length=120)
+
+
+# Schema for resetting password using a token
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8)
+
+
+# Schema for changing password while logged in
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8)

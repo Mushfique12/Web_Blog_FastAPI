@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -28,6 +30,18 @@ def hash_password(password: str) -> str:
 # Verifies a plain text password against a hashed password
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return password_hash.verify(plain_password, hashed_password)
+
+
+# Generates a secure random token for password reset
+def generate_reset_token() -> str:
+    """Generate a secure random token for password reset."""
+    return secrets.token_urlsafe(32)
+
+
+# Hashes the password reset token using SHA-256
+def hash_reset_token(token: str) -> str:
+    """Hash the password reset token using SHA-256."""
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 # Creates a JWT access token with an optional expiration time

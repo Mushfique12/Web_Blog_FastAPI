@@ -4,6 +4,9 @@
 # Environments
 .venv
 
+# Visual Studio Code
+.vscode/
+
 ### Database Files ###
 *.sqlite3
 *.db
